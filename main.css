@@ -149,4 +149,21 @@ p {
   color: var(--defaultTextColor);
   font-family: "Poppins", sans-serif;
 }
+
+#ChatContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  max-height: calc(100% - 7vw);
+  overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  color: red;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--mainThemeCol2);
+}
 /*# sourceMappingURL=main.css.map */

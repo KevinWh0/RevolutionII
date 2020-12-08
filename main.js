@@ -1,5 +1,6 @@
 import { sha256 } from "./scripts/sha256.js";
 import { generateSeededPassword } from "./scripts/security.js";
+import { styleMessage } from "./scripts/styleChat.js";
 
 let roomName = "general-chat";
 let roomID = "XbxzaEahrJlqOD0Q";
@@ -28,8 +29,19 @@ function login() {
   //Add a room listener
   room.on("message", (message) => {
     let text = document.createElement("p");
-    text.innerHTML = `${message.data.name} : ${message.data.content}`;
+    text.innerHTML = styleMessage(
+      `${message.data.name} : ${message.data.content}`,
+      message.data.type
+    );
     document.getElementById("ChatContainer").appendChild(text);
+    /*document
+      .getElementById("ChatContainer")
+      .scrollTo(0, document.getElementById("ChatContainer").scrollHeight);
+*/
+    document.getElementById("ChatContainer").scrollTo({
+      top: document.getElementById("ChatContainer").scrollHeight,
+      behavior: "smooth",
+    });
   });
   //If enter is pressed inside the textbox, send the message by simulating a click
   document
@@ -53,7 +65,12 @@ width=0,height=0,left=-1000,top=-1000`;
     document.getElementById(
       "Chatbar"
     ).value = `<a href = "./VidTest/#${callRoomID}", target = "_blank">Join The Video Call!</a>`;
-    document.getElementById("send").click();
+    sendMessage(
+      document.getElementById("Chatbar").value,
+      "System",
+      "SystemMessage"
+    );
+    document.getElementById("Chatbar").value = "";
   };
 
   //add the click listener to the send button
@@ -71,7 +88,9 @@ function sendMessage(message, user, metadata) {
       room: roomName,
       message: {
         type:
-          "message" /* This will be for later when there are system messages and other things as well as dms */,
+          meta != ""
+            ? meta
+            : "message" /* This will be for later when there are system messages and other things as well as dms */,
         name: user,
         content: message,
       },
