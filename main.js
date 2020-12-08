@@ -38,6 +38,24 @@ function login() {
       if (event.key == "Enter") document.getElementById("send").click();
     });
 
+  //Add the call button functionality
+  document.getElementById("VideoCall").onclick = function () {
+    let callRoomID = Math.floor(Math.random() * 0xffffff).toString(16);
+    let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+width=0,height=0,left=-1000,top=-1000`;
+
+    let openedWindow = window.open(
+      `./VidTest/#${callRoomID}`,
+      "Video Call",
+      params
+    );
+
+    document.getElementById(
+      "Chatbar"
+    ).value = `<a href = "./VidTest/#${callRoomID}", target = "_blank">Join The Video Call!</a>`;
+    document.getElementById("send").click();
+  };
+
   //add the click listener to the send button
   document.getElementById("send").onclick = function () {
     sendMessage(document.getElementById("Chatbar").value, localName);
@@ -45,7 +63,9 @@ function login() {
   };
 }
 
-function sendMessage(message, user) {
+function sendMessage(message, user, metadata) {
+  let meta = "";
+  if (metadata) meta = metadata;
   try {
     drone.publish({
       room: roomName,
