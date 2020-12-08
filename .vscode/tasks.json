@@ -1,0 +1,5 @@
+{
+    "version": "2.0.0",
+    "command": "open",
+    "args": ["-a", "Chrome.app", "index.html"],
+}
