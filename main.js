@@ -6,8 +6,8 @@ import { getImageData, setupUploader } from "./scripts/imageUpload.js";
 let roomName = "general-chat";
 let roomID = "XbxzaEahrJlqOD0Q";
 let password = "P4nfwSrq0xw9IZY9NI+eOHGZV4+ARvGrpXb59ylq+x0";
-let drone = new ScaleDrone(roomID);
-const room = drone.subscribe(roomName);
+let drone;
+let room;
 
 let localName = "";
 
@@ -22,6 +22,11 @@ function loadPassword() {
 }
 
 function login() {
+  drone = new ScaleDrone(roomID);
+  if (document.getElementById("Password").value == "testRoom")
+    room = drone.subscribe("testRoom");
+  else room = drone.subscribe(roomName);
+
   //document.getElementById("loginScreenHolder").style.display = "none";
   document.getElementById("loginScreenHolder").hidden = true;
   document.getElementById("ChatHolder").hidden = false;
@@ -31,9 +36,9 @@ function login() {
   room.on("message", (message) => {
     let text = document.createElement("p");
     text.innerHTML = styleMessage(
-      `${message.data.name} : ${message.data.content}`,
-      message.data.type,
-      message.data.attachments
+      `${atob(message.data.name)} : ${atob(message.data.content)}`,
+      atob(message.data.type),
+      atob(message.data.attachments)
     );
     document.getElementById("ChatContainer").appendChild(text);
     /*document
@@ -97,13 +102,12 @@ function sendMessage(message, user, metadata, attachments) {
     drone.publish({
       room: roomName,
       message: {
-        type:
-          meta != ""
-            ? meta
-            : "message" /* This will be for later when there are system messages and other things as well as dms */,
-        name: user,
-        content: message,
-        attachments: attachments == null ? "" : attachments,
+        type: btoa(
+          meta != "" ? meta : "message"
+        ) /* This will be for later when there are system messages and other things as well as dms */,
+        name: btoa(user),
+        content: btoa(message),
+        attachments: btoa(attachments == null ? "" : attachments),
       },
     });
   } catch (error) {

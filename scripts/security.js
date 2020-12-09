@@ -13,7 +13,9 @@ export function generateSeededPassword() {
   var seed = Math.floor(diff / oneDay) * 9550234;
   var s = "";
   for (var i = 0; i < 10 + (mulberry32(seed * 944) % 32); i++) {
-    s += String.fromCharCode(97 + (mulberry32(seed * 95051 * (i + 1)) % 26));
+    s += String.fromCharCode(
+      97 + ((mulberry32(seed * 95051 * (i + 1)) * 100) % 26)
+    );
   }
   console.log(s);
   return s;
