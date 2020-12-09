@@ -1,0 +1,42 @@
+body {
+  --mainThemeCol1: rgb(43, 43, 43);
+  --popupsTheme: rgb(68, 68, 68);
+  --mainThemeCol2: rgb(107, 107, 107);
+  --defaultTextColor: white;
+  --buttonColor: rgb(0, 212, 0);
+  --HoverColor: rgb(0, 168, 0);
+  background-color: var(--mainThemeCol1);
+}
+
+.video {
+  outline: var(--mainThemeCol2);
+  background-color: var(--mainThemeCol2);
+  border-radius: 14px;
+}
+
+.p {
+  color: var(--defaultTextColor);
+  position: absolute;
+}
+
+#localVideo {
+  position: absolute;
+  top: 50%;
+  right: 1%;
+  width: 48.5%;
+  max-height: 80%;
+  transform: translate(0%, -50%);
+}
+#remoteVideo {
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  width: 48.5%;
+  max-height: 80%;
+  transform: translate(0%, -50%);
+}
+
+#startCapture {
+  position: absolute;
+  bottom: 20px;
+}

@@ -1,8 +1,12 @@
 // Generate random room name if needed
 if (!location.hash) {
-  location.hash = Math.floor(Math.random() * 0xffffff).toString(16);
+  location.hash.split("#")[0] = Math.floor(Math.random() * 0xffffff).toString(
+    16
+  );
 }
-const roomHash = location.hash.substring(1);
+const roomHash = location.hash.substring(1).split("/")[0];
+let type = document.URL.split("#")[2];
+console.log();
 
 // TODO: Replace with your own channel ID
 const drone = new ScaleDrone("ZG3sc4yONExFFmun");
@@ -30,7 +34,7 @@ drone.on("open", (error) => {
   room = drone.subscribe(roomName);
   room.on("open", (error) => {
     if (error) {
-      onError(error);
+      console.error(error);
     }
   });
   // We're connected to the room and received an array of 'members'
@@ -50,7 +54,8 @@ function sendMessage(message) {
     message,
   });
 }
-
+let localStream;
+let media;
 function startWebRTC(isOfferer) {
   pc = new RTCPeerConnection(configuration);
 
@@ -63,12 +68,14 @@ function startWebRTC(isOfferer) {
   };
 
   // If user is offerer let the 'negotiationneeded' event create the offer
+  //This happens if you are the second user
   if (isOfferer) {
     pc.onnegotiationneeded = () => {
-      pc.createOffer().then(localDescCreated).catch(onError);
+      pc.createOffer().then(localDescCreated).catch(console.error);
     };
   }
 
+  //Reciving Data at start
   // When a remote stream arrives display it in the #remoteVideo element
   pc.ontrack = (event) => {
     const stream = event.streams[0];
@@ -77,17 +84,52 @@ function startWebRTC(isOfferer) {
     }
   };
 
-  navigator.mediaDevices
-    .getUserMedia({
+  if (type != "screenshare") {
+    media = navigator.mediaDevices.getUserMedia({
       audio: true,
-      video: true,
-    })
-    .then((stream) => {
+      video: { echoCancellation: true },
+    });
+
+    let localVideo = document.getElementById("localVideo");
+    //Sending Data once at start
+    media.then((stream) => {
       // Display your local video in #localVideo element
       localVideo.srcObject = stream;
       // Add your stream to be sent to the conneting peer
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-    }, onError);
+      localStream = stream;
+
+      stream.getTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+      });
+    }, console.error);
+  } else {
+    //Screenshare!
+    const gdmOptions = {
+      video: {
+        cursor: "always",
+      },
+      audio: {
+        //echoCancellation: true,
+        //noiseSuppression: true,
+        sampleRate: 44100,
+      },
+    };
+    async function startCapture(displayMediaOptions) {
+      try {
+        captureStream = await navigator.mediaDevices.getDisplayMedia(
+          displayMediaOptions
+        );
+        localVideo.srcObject = captureStream;
+
+        captureStream
+          .getTracks()
+          .forEach((track) => pc.addTrack(track, captureStream));
+      } catch (err) {
+        console.error("Error: " + err);
+      }
+    }
+    startCapture(gdmOptions);
+  }
 
   // Listen to signaling data from Scaledrone
   room.on("data", (message, client) => {
@@ -103,17 +145,17 @@ function startWebRTC(isOfferer) {
         () => {
           // When receiving an offer lets answer it
           if (pc.remoteDescription.type === "offer") {
-            pc.createAnswer().then(localDescCreated).catch(onError);
+            pc.createAnswer().then(localDescCreated).catch(console.error);
           }
         },
-        onError
+        console.error
       );
     } else if (message.candidate) {
       // Add the new ICE candidate to our connections remote description
       pc.addIceCandidate(
         new RTCIceCandidate(message.candidate),
         onSuccess,
-        onError
+        console.error
       );
     }
   });
@@ -123,6 +165,47 @@ function localDescCreated(desc) {
   pc.setLocalDescription(
     desc,
     () => sendMessage({ sdp: pc.localDescription }),
-    onError
+    console.error
   );
 }
+
+//Setup Click Listeners
+
+function setupListeners() {
+  document.getElementById("startCapture").onclick = function () {
+    const gdmOptions = {
+      video: {
+        cursor: "always",
+      },
+      audio: {
+        //echoCancellation: true,
+        //noiseSuppression: true,
+        sampleRate: 44100,
+      },
+    };
+    startCapture(gdmOptions);
+  };
+}
+setupListeners();
+
+//Screen Recording
+/*
+async function startCapture(displayMediaOptions) {
+  //pc = new RTCPeerConnection(configuration);
+  let captureStream = null;
+
+  try {
+    captureStream = await navigator.mediaDevices.getDisplayMedia(
+      displayMediaOptions
+    );
+
+    captureStream
+      .getTracks()
+      .forEach((track) => pc.addTrack(track, captureStream));
+    sendMessage({ streams: [captureStream.getTracks()] });
+  } catch (err) {
+    console.error("Error: " + err);
+  }
+  return captureStream;
+}
+*/
