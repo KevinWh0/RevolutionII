@@ -6,6 +6,7 @@ import { getImageData, setupUploader } from "./scripts/imageUpload.js";
 let roomName = "general-chat";
 let roomID = "XbxzaEahrJlqOD0Q";
 let password = "P4nfwSrq0xw9IZY9NI+eOHGZV4+ARvGrpXb59ylq+x0";
+let testerPassword = "0GPGyaNxWWucWWJP0YaRrs5ymPLgS35MwZXuOQ5kht4";
 let drone;
 let room;
 
@@ -22,10 +23,21 @@ function loadPassword() {
 }
 
 function login() {
-  drone = new ScaleDrone(roomID);
-  if (document.getElementById("Password").value == "testRoom")
-    room = drone.subscribe("testRoom");
-  else room = drone.subscribe(roomName);
+  if (
+    sha256.b64_hmac(
+      document.getElementById("Password").value,
+      "Secure Hash!"
+    ) == testerPassword
+  ) {
+    drone = new ScaleDrone("YAQN5ZkBe6gqOlkf");
+
+    room = drone.subscribe(roomName);
+    console.log("logged into tester side");
+  } else {
+    drone = new ScaleDrone(roomID);
+
+    room = drone.subscribe(roomName);
+  }
 
   //document.getElementById("loginScreenHolder").style.display = "none";
   document.getElementById("loginScreenHolder").hidden = true;
@@ -57,6 +69,14 @@ function login() {
       if (event.key == "Enter") document.getElementById("send").click();
     });
 
+  //add the click listener to the send button
+  document.getElementById("send").onclick = function () {
+    if (document.getElementById("Chatbar").value != "") {
+      sendMessage(document.getElementById("Chatbar").value, localName);
+      document.getElementById("Chatbar").value = "";
+    }
+  };
+
   //Add the call button functionality
   document.getElementById("VideoCall").onclick = function () {
     let callRoomID = Math.floor(Math.random() * 0xffffff).toString(16);
@@ -84,12 +104,6 @@ width=0,height=0,left=-1000,top=-1000`;
   //document.getElementById("fileinput").addEventListener("change", function () {
   //getImageData();
   //});
-
-  //add the click listener to the send button
-  document.getElementById("send").onclick = function () {
-    sendMessage(document.getElementById("Chatbar").value, localName);
-    document.getElementById("Chatbar").value = "";
-  };
 }
 export function safeSendAttachment(attachments) {
   sendMessage("", localName, "User", attachments);
@@ -122,7 +136,11 @@ document.getElementById("loginButton").onclick = function () {
     sha256.b64_hmac(
       document.getElementById("Password").value,
       "Secure Hash!"
-    ) == password
+    ) == password ||
+    sha256.b64_hmac(
+      document.getElementById("Password").value,
+      "Secure Hash!"
+    ) == testerPassword
   ) {
     login();
   }
