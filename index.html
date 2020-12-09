@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-    <meta charset="utf-8" />
+<meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Recent - Google Drive</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -13,6 +13,7 @@
     <script src="https://kit.fontawesome.com/63f8f44888.js" crossorigin="anonymous"></script>
   </head>
   <body id="body">
+    <div id = "dropbox">
     <div id = "loginScreenHolder">
       <h1 id = "LoginTitle">Login</h1>
       <input id = "Username" placeholder="Username"></input>
@@ -25,10 +26,20 @@
       <div id = "inputBar">
         <input id = "Chatbar"></input>
         <button id = "send">Send</button>
+        <button id = "fileUpload" onclick="document.getElementById('fileinput').click()"><input type="file" id="fileinput" multiple accept="*" style="display:none"><i class="fas fa-cloud-upload-alt"></i></button>
+        
+        <!--<input type="file" id="fileUpload" multiple accept="*" style="display:none" onchange="handleFiles(this.files)">
+      -->
+        <a href="#" id="fileSelect"></a>
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        
+        <a href="#" id="urlSelect"></a>
         <button id = "VideoCall"><i class="fas fa-video fa-lg"></i></button>
       </div>
     </div>
-
+  </div>
       
   </body>
   <script src="main.js" type="module"></script>

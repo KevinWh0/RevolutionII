@@ -1,6 +1,7 @@
 import { sha256 } from "./scripts/sha256.js";
 import { generateSeededPassword } from "./scripts/security.js";
 import { styleMessage } from "./scripts/styleChat.js";
+import { getImageData, setupUploader } from "./scripts/imageUpload.js";
 
 let roomName = "general-chat";
 let roomID = "XbxzaEahrJlqOD0Q";
@@ -31,7 +32,8 @@ function login() {
     let text = document.createElement("p");
     text.innerHTML = styleMessage(
       `${message.data.name} : ${message.data.content}`,
-      message.data.type
+      message.data.type,
+      message.data.attachments
     );
     document.getElementById("ChatContainer").appendChild(text);
     /*document
@@ -72,6 +74,11 @@ width=0,height=0,left=-1000,top=-1000`;
     );
     document.getElementById("Chatbar").value = "";
   };
+  //Add file upload listener
+  setupUploader();
+  //document.getElementById("fileinput").addEventListener("change", function () {
+  //getImageData();
+  //});
 
   //add the click listener to the send button
   document.getElementById("send").onclick = function () {
@@ -79,10 +86,13 @@ width=0,height=0,left=-1000,top=-1000`;
     document.getElementById("Chatbar").value = "";
   };
 }
-
-function sendMessage(message, user, metadata) {
+export function safeSendAttachment(attachments) {
+  sendMessage("", localName, "User", attachments);
+}
+function sendMessage(message, user, metadata, attachments) {
   let meta = "";
   if (metadata) meta = metadata;
+  if (!attachments) attachments = null;
   try {
     drone.publish({
       room: roomName,
@@ -93,6 +103,7 @@ function sendMessage(message, user, metadata) {
             : "message" /* This will be for later when there are system messages and other things as well as dms */,
         name: user,
         content: message,
+        attachments: attachments == null ? "" : attachments,
       },
     });
   } catch (error) {

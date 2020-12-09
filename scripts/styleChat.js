@@ -1,18 +1,7 @@
-export function styleMessage(message, type) {
+export function styleMessage(message, type, attachments) {
   let msg = message;
-  console.log(type);
+  //console.log(type);
   if (type != "SystemMessage") {
-    /*let susLevel = 0;
-    if (msg.incldes("<")) susLevel++;
-    if (msg.incldes(">")) susLevel++;
-    if (msg.incldes('"')) susLevel++;
-    if (msg.incldes("'")) susLevel++;
-    if (msg.incldes("onClick")) susLevel++;
-    if (msg.incldes("onLoad")) susLevel++;
-
-    if (susLevel > 1) {
-      return msg
-    }*/
     msg = msg.replaceAll(/</gi, "&lt;");
     msg = msg.replaceAll(/>/gi, "&gt;");
   }
@@ -35,6 +24,11 @@ export function styleMessage(message, type) {
     }
     msg = split.join(" ");
   }
-
+  //Deal with attachments
+  if (attachments != undefined) {
+    if (attachments.includes("data:") || attachments.includes("cloudinary")) {
+      msg += `<image src = "${attachments}" class = "ChatImg">`;
+    }
+  }
   return msg;
 }
