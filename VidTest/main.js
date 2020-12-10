@@ -236,8 +236,10 @@ document.getElementById("Deafen").onclick = function () {
   if (icon.className == "fas fa-volume-up") {
     icon.className = "fas fa-volume-mute";
     locallyMuted = true;
+    document.getElementById("remoteVideo").volume = 0;
   } else {
     icon.className = "fas fa-volume-up";
     locallyMuted = false;
+    document.getElementById("remoteVideo").volume = 1;
   }
 };
