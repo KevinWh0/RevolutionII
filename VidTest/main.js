@@ -6,7 +6,8 @@ if (!location.hash) {
 }
 const roomHash = location.hash.substring(1).split("/")[0];
 let type = document.URL.split("#")[2];
-console.log();
+
+let locallyMuted = false;
 
 // TODO: Replace with your own channel ID
 const drone = new ScaleDrone("ZG3sc4yONExFFmun");
@@ -26,7 +27,7 @@ function onSuccess() {}
 function onError(error) {
   console.error(error);
 }
-
+let isOfferer;
 drone.on("open", (error) => {
   if (error) {
     return console.error(error);
@@ -42,8 +43,16 @@ drone.on("open", (error) => {
   room.on("members", (members) => {
     console.log("MEMBERS", members);
     // If we are the second user to connect to the room we will be creating the offer
-    const isOfferer = members.length === 2;
+    isOfferer = members.length === 2;
     startWebRTC(isOfferer);
+  });
+  room.on("message", (message) => {
+    if (message.data.offerer != isOfferer)
+      if (message.data.muted) {
+        document.getElementById("remoteVideo").volume = 0;
+      } else {
+        if (!locallyMuted) document.getElementById("remoteVideo").volume = 1;
+      }
   });
 });
 
@@ -170,8 +179,9 @@ function localDescCreated(desc) {
 }
 
 //Setup Click Listeners
-
+/*
 function setupListeners() {
+  
   document.getElementById("startCapture").onclick = function () {
     const gdmOptions = {
       video: {
@@ -187,6 +197,7 @@ function setupListeners() {
   };
 }
 setupListeners();
+*/
 
 //Screen Recording
 /*
@@ -209,3 +220,24 @@ async function startCapture(displayMediaOptions) {
   return captureStream;
 }
 */
+
+document.getElementById("Mute").onclick = function () {
+  let icon = document.getElementById("muteIcon");
+  if (icon.className == "fas fa-microphone") {
+    icon.className = "fas fa-microphone-slash";
+    sendMessage({ muted: true, offerer: isOfferer });
+  } else {
+    icon.className = "fas fa-microphone";
+    sendMessage({ muted: false, offerer: isOfferer });
+  }
+};
+document.getElementById("Deafen").onclick = function () {
+  let icon = document.getElementById("DeafenIcon");
+  if (icon.className == "fas fa-volume-up") {
+    icon.className = "fas fa-volume-mute";
+    locallyMuted = true;
+  } else {
+    icon.className = "fas fa-volume-up";
+    locallyMuted = false;
+  }
+};
