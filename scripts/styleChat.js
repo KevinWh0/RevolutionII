@@ -30,8 +30,10 @@ export function styleMessage(message, type, attachments) {
           split[i] +
           `
         </br>
-        <image src = "https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&height=480&width=640&url=${url}"></image>
+        <img src="//image.thum.io/get/${url}" />
         `;
+        //<image src = "https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&height=480&width=640&url=${url}"></image>
+        //`;
         //https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&url=
         //}
       }
