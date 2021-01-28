@@ -17,9 +17,23 @@ export function styleMessage(message, type, attachments) {
           split[i].split("=")[1].split("&")[0]
         }" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       }
+
       //Make URLS clickable
       if (split[i].startsWith("http")) {
+        let url = split[i];
         split[i] = `<a href = "${split[i]}", target = "_blank">${split[i]}</a>`;
+        //}
+        //if (!split[i].startsWith("https://www.youtube.com/watch")) {
+        //https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&url=http://google.com
+        //alert(url);
+        split[i] =
+          split[i] +
+          `
+        </br>
+        <image src = "https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&height=480&width=640&url=${url}"></image>
+        `;
+        //https://api.apiflash.com/v1/urltoimage?access_key=d19c4430e3d54e00bc278876fa12b98e&url=
+        //}
       }
     }
     msg = split.join(" ");
