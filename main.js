@@ -50,7 +50,7 @@ function login() {
     let text = document.createElement("p");
     text.innerHTML = styleMessage(
       `${atob(message.data.name)} : ${sjcl.decrypt(
-        "password" + new Date().getDay(),
+        "rrlXasfF3XmzEjfaxZnPwpbfBfZsD1N2aP8J4h6b" + new Date().getDay(),
         JSON.parse(atob(message.data.content))
       )}`,
       atob(message.data.type),
@@ -118,7 +118,10 @@ function sendMessage(message, user, metadata, attachments) {
   if (!attachments) attachments = null;
 
   try {
-    var encrypted = sjcl.encrypt("password" + new Date().getDay(), message);
+    var encrypted = sjcl.encrypt(
+      "rrlXasfF3XmzEjfaxZnPwpbfBfZsD1N2aP8J4h6b" + new Date().getDay(),
+      message
+    );
 
     drone.publish({
       room: roomName,
