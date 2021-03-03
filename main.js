@@ -2,6 +2,7 @@ import { sha256 } from "./scripts/sha256.js";
 import { generateSeededPassword } from "./scripts/security.js";
 import { styleMessage } from "./scripts/styleChat.js";
 import { getImageData, setupUploader } from "./scripts/imageUpload.js";
+//import * as sjcl from "https://bitwiseshiftleft.github.io/sjcl/sjcl.js";
 
 let roomName = "general-chat";
 let roomID = "XbxzaEahrJlqOD0Q";
@@ -48,7 +49,10 @@ function login() {
   room.on("message", (message) => {
     let text = document.createElement("p");
     text.innerHTML = styleMessage(
-      `${atob(message.data.name)} : ${atob(message.data.content)}`,
+      `${atob(message.data.name)} : ${sjcl.decrypt(
+        "password" + new Date().getDay(),
+        JSON.parse(atob(message.data.content))
+      )}`,
       atob(message.data.type),
       atob(message.data.attachments)
     );
@@ -112,7 +116,10 @@ function sendMessage(message, user, metadata, attachments) {
   let meta = "";
   if (metadata) meta = metadata;
   if (!attachments) attachments = null;
+
   try {
+    var encrypted = sjcl.encrypt("password" + new Date().getDay(), message);
+
     drone.publish({
       room: roomName,
       message: {
@@ -120,7 +127,7 @@ function sendMessage(message, user, metadata, attachments) {
           meta != "" ? meta : "message"
         ) /* This will be for later when there are system messages and other things as well as dms */,
         name: btoa(user),
-        content: btoa(message),
+        content: btoa(JSON.stringify(encrypted)),
         attachments: btoa(attachments == null ? "" : attachments),
       },
     });
